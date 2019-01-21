@@ -4,6 +4,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-post-list',
@@ -17,14 +18,19 @@ export class PostListComponent implements OnInit, OnDestroy {
   //   { title: 'Third Post', content: 'This is the third post content!' }
   // ];
   posts: Post[] = [];
-  private postsSubscription: Subscription;
   isLoading = false;
   totalPosts = 0;
   postsPerPage = 2;
   currentPage = 1;
   pageSizeOptions = [1, 2, 5, 10];
+  userIsAuthenticated = false;
+  private authStatusSub: Subscription;
+  private postsSubscription: Subscription;
 
-  constructor(public postService: PostsService) {}
+  constructor(
+    public postService: PostsService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     this.isLoading = true;
@@ -36,10 +42,13 @@ export class PostListComponent implements OnInit, OnDestroy {
         this.posts = postData.posts;
         this.isLoading = false;
       });
-  }
 
-  ngOnDestroy() {
-    this.postsSubscription.unsubscribe();
+    this.userIsAuthenticated = this.authService.getIsAuth();
+    this.authStatusSub = this.authService
+      .getAuthStatusListener()
+      .subscribe((isAuthenticated: boolean) => {
+        this.userIsAuthenticated = isAuthenticated;
+      });
   }
 
   onChangedPage(pageData: PageEvent) {
@@ -54,5 +63,10 @@ export class PostListComponent implements OnInit, OnDestroy {
     this.postService.deletePost(postId).subscribe(() => {
       this.postService.getPosts(this.postsPerPage, this.currentPage);
     });
+  }
+
+  ngOnDestroy() {
+    this.postsSubscription.unsubscribe();
+    this.authStatusSub.unsubscribe();
   }
 }
