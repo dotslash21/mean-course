@@ -10,13 +10,15 @@ const app = express();
 
 mongoose
   .connect(
-    "mongodb+srv://dotslash21:1rlnwYkgXo0IE0h8@testzone51-ksuva.mongodb.net/mean-course?retryWrites=true"
+    "mongodb+srv://dotslash21:" +
+      process.env.MONGO_ATLAS_PW +
+      "@testzone51-ksuva.mongodb.net/mean-course?retryWrites=true"
   )
   .then(() => {
     console.log("Database connection established successfully!");
   })
-  .catch(() => {
-    console.log("Database connection failed!");
+  .catch(error => {
+    console.log("Database connection failed!", error.message);
   });
 
 app.use(bodyParser.json());
