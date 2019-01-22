@@ -25,7 +25,8 @@ router.post("/signup", (req, res, next) => {
       })
       .catch(error => {
         res.status(500).json({
-          error: error
+          message:
+            "A user with the entered email already exists, please use another email!"
         });
       });
   });
@@ -38,7 +39,8 @@ router.post("/login", (req, res, next) => {
       fetchedUser = user;
       if (!user) {
         return res.status(401).json({
-          message: "User authentication failed!"
+          message:
+            "User authentication failed, Invalid authentication credentials!"
         });
       }
       return bcrypt.compare(req.body.password, user.password);
@@ -46,7 +48,8 @@ router.post("/login", (req, res, next) => {
     .then(result => {
       if (!result) {
         return res.status(401).json({
-          message: "User authentication failed!"
+          message:
+            "User authentication failed, Invalid authentication credentials!"
         });
       }
 
